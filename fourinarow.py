@@ -57,6 +57,9 @@ def print_stats(statistics):
         print("O Win Percentage: %.2f" % (winPercent2))
 
     print("\nTied Games: %d" % (statistics[2]))
+    if gamesPlayed != 0:
+        tiePercent = 100 * statistics[2] / (statistics[0] + statistics[1] + statistics[2])
+        print("Tie Percentage: %.2f" % (tiePercent))
 
     print("\n")
 
