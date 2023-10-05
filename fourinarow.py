@@ -9,22 +9,20 @@ def main():
 
     statistics = [0, 0, 0]
 
-    board = []
-    for i in range(height * width):
-        board.append("-")
-
     while 1 == 1:
         mode = gamemode()
         while mode == -1:
             print_stats(statistics)
             mode = gamemode()
-        game(height, width, board, statistics)
+        game(mode, height, width, statistics, winCondition)
 
 def gamemode():
-    mode = input("Play | Statistics | Quit\n")
+    mode = input("Play | Multiplayer | Statistics | Quit\n")
     while 1 == 1:
         if mode == "Play" or mode == "play" or mode == "P" or mode == "p":
             return 0
+        if mode == "Multiplayer" or mode == "multiplayer" or mode == "M" or mode == "m":
+            return 1
         elif mode == "Statistics" or mode == "statistics" or mode == "S" or mode == "s":
             return -1
         elif mode == "Quit" or mode == "quit" or mode == "Q" or mode == "q":
@@ -34,15 +32,14 @@ def gamemode():
             print("Please enter a valid option\n")
             mode = input("Play | Statistics | Quit\n")
             
-
 def print_stats(statistics):
     gamesPlayed = statistics[0] + statistics[1] + statistics[2]
     print("\n\nGames Played: %d" % (gamesPlayed))
 
-    print("\n# Wins: %d" % (statistics[0]))
+    print("\nX Wins: %d" % (statistics[0]))
     if gamesPlayed != 0:
         winPercent1 = 100 * statistics[0] / (statistics[0] + statistics[1] + statistics[2])
-        print("# Win Percentage: %d" % (winPercent1))
+        print("X Win Percentage: %d" % (winPercent1))
 
     print("\nO Wins: %s" % (statistics[1]))
     if gamesPlayed != 0:
@@ -53,33 +50,56 @@ def print_stats(statistics):
 
     print("\n")
 
-def game(height, width, board, statistics):
+def game(mode, height, width, statistics, winCondition):
+    board = []
+    for i in range(height * width):
+        board.append("-")
+
+    outcome = 0
     while 1 == 1:
-        print("\n#'s turn:")
-        print_board(height, width, board)
-        choice = player_input(height, width, board)
-        for i in range(1, height + 1):
-            if board[(choice - 1) + (height - i) * width] == "-":
-                board[(choice - 1) + (height - i) * width] = "#"
-                break
-        if win_condition(board) == True:
+        if outcome == 0:
+            gamer = "X"
+            outcome = player(mode, gamer, height, width, board, winCondition)
+        if outcome == 0:
+            gamer = "O"
+            outcome = player(mode, gamer, height, width, board, winCondition)
+
+        if outcome == 1:
             print()
             print_board(height, width, board)
-            print("# WINS!\n")
-            statistics[0] = statistics[0] + 1
+            print("%s WINS!\n" % gamer)
+            if gamer == "X":
+                statistics[0] = statistics[0] + 1
+            if gamer == "O":
+                statistics[1] = statistics[1] + 1
+            return
+        
+        if outcome == 2:
+            print()
+            print_board(height, width, board)
+            print("It's a draw!\n")
+            statistics[2] = statistics[2] + 1
             return
 
-        print("\nO's turn:")
-        print_board(height, width, board)
-        choice = player_input(height, width, board)
-        for i in range(1, height + 1):
-            if board[(choice - 1) + (height - i) * width] == "-":
-                board[(choice - 1) + (height - i) * width] = "O"
-                break
-        if win_condition(board) == True:
-            print("O WINS!")
-            statistics[1] = statistics[1] + 1
-            return
+def player(mode, gamer, height, width, board, winCondition):
+    print("\n%s's turn:" % (gamer))
+    print_board(height, width, board)
+
+    if mode == 1 or gamer == "X":
+        selection = player_input(height, width, board)
+    elif mode == 0:
+        selection = computer_input(height, width, board)
+
+    for i in range(1, height + 1):
+        if board[(selection - 1) + (height - i) * width] == "-":
+            board[(selection - 1) + (height - i) * width] = gamer
+            break
+    if win_condition(board, height, width, winCondition) == True:
+        return 1
+    elif draw_condition(board) == True:
+        return 2
+    else:
+        return 0
 
 def print_board(height, width, board):
     for i in range(height):
@@ -102,8 +122,69 @@ def player_input(height, width, board):
         else:
             print("Please pick a column between 1 and %s" % (width))
     return column       
-                
-def win_condition(board):
-    return False
+
+def computer_input(height, width, board):
+    column = 0
+    emptySpace = 0
+    while (column < 1 or column > width) or emptySpace == 0:
+        column = choice(range(width)) + 1
+        if not(column < 1 or column > width):
+            for i in range(height):
+                if board[(column - 1) + i * width] == "-":
+                    emptySpace = emptySpace + 1
+    return column      
+
+def win_condition(board, height, width, winCondition):
+    for columnID in range(0, height * width, width):
+        for column in range(0, width - winCondition + 1):
+            if board[columnID + column] != "-":
+                check = board[columnID + column]
+                matchCounter = 0
+                for i in range(1, winCondition):
+                    if board[columnID + column + i] == check:
+                        matchCounter = matchCounter + 1
+                    if matchCounter == winCondition - 1:
+                        return True
+    
+    for columnID in range(0, (height - winCondition + 1) * width , width):
+        for column in range(0, width):
+            if board[columnID + column] != "-":
+                check = board[columnID + column]
+                matchCounter = 0
+                for i in range(width, winCondition * width, width):
+                    if board[columnID + column + i] == check:
+                        matchCounter = matchCounter + 1
+                    if matchCounter == winCondition - 1:
+                        return True
+
+    for columnID in range(0, (height - winCondition + 1) * width , width):
+        for column in range(0, width - winCondition + 1):
+            if board[columnID + column] != "-":
+                check = board[columnID + column]
+                matchCounter = 0
+                for i in range(width + 1, winCondition * width + winCondition, width + 1):
+                    if board[columnID + column + i] == check:
+                        matchCounter = matchCounter + 1
+                    if matchCounter == winCondition - 1:
+                        return True
+    
+    for columnID in range(0, (height - winCondition + 1) * width , width):
+        for column in range(winCondition - 1, width):
+            if board[columnID + column] != "-":
+                check = board[columnID + column]
+                matchCounter = 0
+                for i in range(width - 1, winCondition * width - winCondition, width - 1):
+                    if board[columnID + column + i] == check:
+                        matchCounter = matchCounter + 1
+                    if matchCounter == winCondition - 1:
+                        return True
+
+def draw_condition(board):
+    emptySquares = 0
+    for square in board:
+        if square == "-":
+            emptySquares = emptySquares + 1
+    if emptySquares == 0:
+        return True
 
 main()
