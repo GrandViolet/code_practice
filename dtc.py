@@ -9,8 +9,7 @@ def main():
 
     statistics = [0, 0, 0, 0]
     
-    play = "y"
-    while play == "y":
+    while 1 == 1:
         mode = gamemode(statistics)
         while mode == -1:
             stats(statistics)
@@ -18,8 +17,7 @@ def main():
         game(symbols, mode, maxAttempts, statistics)
 
 def gamemode(statistics):
-    invalidMode = True
-    while invalidMode == True:
+    while 1 == 1:
         mode = input("Normal | Hard | Statistics | Quit\n")
         if mode == "normal" or mode == "Normal" or mode == "n" or mode == "N":
             statistics[0] = statistics[0] + 1
