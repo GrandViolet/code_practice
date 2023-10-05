@@ -14,15 +14,25 @@ def main():
         while mode == -1:
             print_stats(statistics)
             mode = gamemode()
-        game(mode, height, width, statistics, winCondition)
+        if mode == 2:
+            games = int(input("How many games would you like it to play?\n"))
+            gameCount = 0
+            while gameCount < games:
+                game(mode, height, width, statistics, winCondition)
+                gameCount = gameCount + 1
+            print_stats(statistics)
+        else:
+            game(mode, height, width, statistics, winCondition)
 
 def gamemode():
-    mode = input("Play | Multiplayer | Statistics | Quit\n")
+    mode = input("Play | Multiplayer | Auto | Statistics | Quit\n")
     while 1 == 1:
         if mode == "Play" or mode == "play" or mode == "P" or mode == "p":
             return 0
-        if mode == "Multiplayer" or mode == "multiplayer" or mode == "M" or mode == "m":
+        elif mode == "Multiplayer" or mode == "multiplayer" or mode == "M" or mode == "m":
             return 1
+        elif mode == "Auto" or mode == "auto" or mode == "A" or mode == "a":
+            return 2
         elif mode == "Statistics" or mode == "statistics" or mode == "S" or mode == "s":
             return -1
         elif mode == "Quit" or mode == "quit" or mode == "Q" or mode == "q":
@@ -30,7 +40,7 @@ def gamemode():
             quit()
         else:
             print("Please enter a valid option\n")
-            mode = input("Play | Statistics | Quit\n")
+            mode = input("Play | Multiplayer | Auto | Statistics | Quit\n")
             
 def print_stats(statistics):
     gamesPlayed = statistics[0] + statistics[1] + statistics[2]
@@ -85,9 +95,11 @@ def player(mode, gamer, height, width, board, winCondition):
     print("\n%s's turn:" % (gamer))
     print_board(height, width, board)
 
-    if mode == 1 or gamer == "X":
+    if mode == 0 and gamer != "X":
+        selection = computer_input(height, width, board)
+    elif mode == 1:
         selection = player_input(height, width, board)
-    elif mode == 0:
+    elif mode == 2:
         selection = computer_input(height, width, board)
 
     for i in range(1, height + 1):
