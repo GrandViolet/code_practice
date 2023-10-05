@@ -97,10 +97,10 @@ def player(mode, gamer, height, width, board, winCondition):
 
     if mode == 0 and gamer != "X":
         selection = computer_input(height, width, board)
-    elif mode == 1:
-        selection = player_input(height, width, board)
     elif mode == 2:
         selection = computer_input(height, width, board)
+    else:
+        selection = player_input(height, width, board)
 
     for i in range(1, height + 1):
         if board[(selection - 1) + (height - i) * width] == "-":
