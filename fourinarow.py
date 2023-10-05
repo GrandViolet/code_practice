@@ -49,12 +49,12 @@ def print_stats(statistics):
     print("\nX Wins: %d" % (statistics[0]))
     if gamesPlayed != 0:
         winPercent1 = 100 * statistics[0] / (statistics[0] + statistics[1] + statistics[2])
-        print("X Win Percentage: %d" % (winPercent1))
+        print("X Win Percentage: %.2f" % (winPercent1))
 
-    print("\nO Wins: %s" % (statistics[1]))
+    print("\nO Wins: %d" % (statistics[1]))
     if gamesPlayed != 0:
         winPercent2 = 100 * statistics[1] / (statistics[0] + statistics[1] + statistics[2])
-        print("O Win Percentage: %d" % (winPercent2))
+        print("O Win Percentage: %.2f" % (winPercent2))
 
     print("\nTied Games: %d" % (statistics[2]))
 
