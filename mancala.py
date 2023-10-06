@@ -4,41 +4,40 @@ def main():
     houses = 6
     startingStones = 4
 
-    print("\nWelcome to Mancala!")
+    print("\nWelcome to Mancala!\n")
 
     statistics = [0, 0, 0]
+
     while 1 == 1:
         mode = gamemode()
         while mode == -1:
             stats(statistics)
             mode = gamemode()
         if mode == 2:
-                games = int(input("How many games would you like it to play?\n"))
-                gameCount = 0
-                while gameCount < games:
-                    game(statistics, mode, houses, startingStones)
-                    gameCount = gameCount + 1
-                stats(statistics)
-        if mode == 0 or mode == 1:
+            games = int(input("How many games would you like it to play?\n"))
+            gameCount = 0
+            while gameCount < games:
+                game(statistics, mode, houses, startingStones)
+                gameCount = gameCount + 1
+            stats(statistics)
+        else:
             game(statistics, mode, houses, startingStones)
 
 def gamemode():
-    mode = input("Multiplayer | Computer | Automatic | Statistics | Quit\n")
     while 1 == 1:
+        mode = input("Multiplayer | Computer | Auto | Statistics | Quit\n")
         if mode == "Multiplayer" or mode == "multiplayer" or mode == "M" or mode == "m":
             return 0
-        elif mode == "Computer" or mode == "computer" or mode == "C" or mode == "c":
+        if mode == "Computer" or mode == "computer" or mode == "C" or mode == "c":
             return 1
-        elif mode == "Automatic" or mode == "automatic" or mode == "A" or mode == "a":
+        if mode == "Auto" or mode == "auto" or mode == "A" or mode == "a":
             return 2
-        elif mode == "Statistics" or mode == "statistics" or mode == "S" or mode == "s":
+        if mode == "Statistics" or mode == "statistics" or mode == "S" or mode == "s":
             return -1
-        elif mode == "Quit" or mode == "quit" or mode == "Q" or mode == "q":
+        if mode == "Quit" or mode == "quit" or mode == "Q" or mode == "q":
             print("\nThanks for playing!\n")
             quit()
-        else:
-            print("Please enter a valid option\n")
-            mode = input("Multiplayer | Computer | Automatic | Statistics | Quit\n")
+        print("Please enter a valid option\n")
 
 def stats(statistics):
     gamesPlayed = statistics[0] + statistics[1] + statistics[2]
@@ -106,16 +105,15 @@ def print_board(board, houses):
     row1 = " " * (len(str(board[len(board) - 1])) + 2)
     for i in range(houses):
         row1 = row1 + str(board[(len(board)) - (2 + i)]) + " "
-    print(row1)
-
+    
     row2 = " " * (len(str(board[len(board) - 1])) + 2)
     for i in range(houses):
         row2 = row2 + str(board[i]) + " "
     
     rowLength = max(len(row1), len(row2))
 
+    print(row1)
     print(str(board[len(board) - 1]) + " " * rowLength + str(board[houses]))
-
     print(row2)
 
     print()
@@ -159,8 +157,8 @@ def stone_distribution(board, stones, house, houses):
 
 def capture(board, house, i, houses):
     if board[house + i] == 1:
-        if board[len(board) - 2 - (house + i)] != 0:
-            if house + i < houses:
+        if house + i < houses:
+            if board[len(board) - 2 - (house + i)] != 0:
                 board[houses] = board[houses] + board[len(board) - 2 - (house + i)] + 1
                 board[house + i] = 0
                 board[len(board) - 2 - (house + i)] = 0
