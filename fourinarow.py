@@ -25,22 +25,20 @@ def main():
             game(mode, height, width, statistics, winCondition)
 
 def gamemode():
-    mode = input("Play | Multiplayer | Auto | Statistics | Quit\n")
     while 1 == 1:
+        mode = input("Play | Multiplayer | Auto | Statistics | Quit\n")
         if mode == "Play" or mode == "play" or mode == "P" or mode == "p":
             return 0
-        elif mode == "Multiplayer" or mode == "multiplayer" or mode == "M" or mode == "m":
+        if mode == "Multiplayer" or mode == "multiplayer" or mode == "M" or mode == "m":
             return 1
-        elif mode == "Auto" or mode == "auto" or mode == "A" or mode == "a":
+        if mode == "Auto" or mode == "auto" or mode == "A" or mode == "a":
             return 2
-        elif mode == "Statistics" or mode == "statistics" or mode == "S" or mode == "s":
+        if mode == "Statistics" or mode == "statistics" or mode == "S" or mode == "s":
             return -1
-        elif mode == "Quit" or mode == "quit" or mode == "Q" or mode == "q":
+        if mode == "Quit" or mode == "quit" or mode == "Q" or mode == "q":
             print("\nThanks for playing!\n")
             quit()
-        else:
-            print("Please enter a valid option\n")
-            mode = input("Play | Multiplayer | Auto | Statistics | Quit\n")
+        print("Please enter a valid option\n")
             
 def print_stats(statistics):
     gamesPlayed = statistics[0] + statistics[1] + statistics[2]
