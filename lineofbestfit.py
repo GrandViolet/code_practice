@@ -1,5 +1,6 @@
-from math import *
 
+
+from math import *
 def main():
     points = get_points()
 
@@ -21,12 +22,11 @@ def main():
     b1 = (f - ((b * e) / a)) / (d - ((b * b) / a))
     print("\ny = %f + %fx" % (b0,b1))
 
-    error = 0
-    for point in points:
-        error = error + (b0 + (b1 * point[0]) - point[1])**2
-    error = sqrt(error)
-    print("error: %f\n" % (error))
+    errorAmt = error(points,b0,b1)
+    print("error: %f\n" % (errorAmt))
 
+    input()
+    
 def get_points():
     points = []
     for i in range(int(input("\n# of points: "))):
@@ -34,5 +34,12 @@ def get_points():
         y = input("y%d: " % (i + 1))
         points.append([float(x),float(y)])
     return points
+
+def error(points,b0,b1):
+    error = 0
+    for point in points:
+        error = error + (b0 + (b1 * point[0]) - point[1])**2
+    error = sqrt(error)
+    return error
 
 main()
