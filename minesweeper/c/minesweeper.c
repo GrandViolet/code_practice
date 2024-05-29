@@ -4,7 +4,7 @@
  * V Buckley
  * 05.29.2024
  * 
- * v1.101
+ * v1.102
  */
 
 
@@ -134,32 +134,44 @@ void print_board(int width, int height, int *board) {
     int cellNum;
     char cell;
 
+    printf("+-");
+    for (int k = 0; k < width * 3; k++) {
+        printf("-");
+    }
+    printf("-+\n");
+    
     for (int i = 0; i < height; i++) {
+        printf("| ");
         for (int j = 0; j < width; j++) {
             cellNum = board[j + (i * width)];
             
             if (cellNum == 0) {                             // Empty (0)
-                cell = ' ';
+                printf(" %c ", ' ');
             } else if ((cellNum >= 1) && (cellNum <= 8)) {  // Number (1-8)
-                cell = cellNum + 48;
+                printf(" %d ", cellNum);
             } else if (cellNum == 9) {                      // Mine (9)
-                cell = 'M';
+                printf("💣 ");
             } else if (cellNum == 10) {                     // Flag (10)
-                cell = 'F';
+                printf(" 🚩");
             } else if (cellNum == 11) {                     // Hidden (11)
-                cell = '-';
+                printf(" - ");
             } else if (cellNum == 12) {                     // Explosion (12)
-                cell = 'E';
+                printf("💥 ");
             } else {
                 printf("\nERROR: Unexpected value in found in game board\n\n");
                 exit(1);
             }
-
-            printf(" %c ", cell);
         }
 
-        printf("\n");
+        printf(" |\n");
     }
+
+    printf("+-");
+    for (int k = 0; k < width * 3; k++) {
+        printf("-");
+    }
+    printf("-+\n");
+
 }
 
 
