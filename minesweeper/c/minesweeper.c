@@ -2,33 +2,45 @@
  * Play the game of Minesweeper
  * 
  * V Buckley
- * 05.29.2024
+ * Started: 05.29.2024
  * 
- * v1.103
+ * v1.104
  */
 
 
 
 /******************************* Header Files *******************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 
 
+
+/******************************* Definitions *******************************/
+
+#define MAXLENGTH 1024
+
+
+
+
 /*************************** Function Prototypes ***************************/
+
 int *generate_game(int width, int height, int mines);
 void play_minesweeper(int width, int height, int *board, int* currentBoard);
 void print_board(int width, int height, int *board);
 int *generate_blank_board(int width, int height);
 void update_neighbor_counts(int width, int height, int *board);
 int count_neighbors(int width, int height, int *board, int i, int j, int type);
+int get_int_input(int low, int high);
+
 
 
 
 /******************************** Functions ********************************/
+
 int main() {
-    printf("DEBUG: in main\n");
 
     int loop = 1;
     int difficulty = 1;
@@ -38,6 +50,8 @@ int main() {
     int *currentBoard;
 
     srand(time(NULL));
+
+    get_int_input(1, 2);
 
     while (loop) {
         if (difficulty == 0) {
@@ -53,7 +67,7 @@ int main() {
             height = 16;
             mines = 99;
         } else {
-            printf("\nERROR: invalid difficulty setting!\n\n");
+            fprintf(stderr, "\nERROR: invalid difficulty setting");
             exit(1);
             //     print()
 
@@ -79,23 +93,21 @@ int main() {
 
 
 
+/*
+ * Generate the Minesweeper game board
+ * Args:
+ *      width (int) - the width of the Minesweeper board
+ *      height (int) - the height of the Minesweeper board
+ *      mines (int) - the number of mines to be placed on the board
+ * Ret:
+ *      board (int *) - the game board, where each cell is either a mine (9) or the number of neighboring mines (1-8)
+ */
 int *generate_game(int width, int height, int mines) {
-    /*
-     * Generate the Minesweeper game board
-     * 
-     * Args:
-     *      width (int) - the width of the Minesweeper board
-     *      height (int) - the height of the Minesweeper board
-     *      mines (int) - the number of mines to be placed on the board
-     * Ret:
-     *      board (int *) - the game board, where each cell is either a mine (9) or the number of neighboring mines (1-8)
-     */
-    printf("DEBUG: in generate_game\n");
 
     int *board = malloc(sizeof(int) * (width * height));
 
     if (!board) {
-        printf("\nERROR: malloc failed!\n\n");
+        perror("\nERROR: malloc failed");
         exit(1);
     }
 
@@ -120,18 +132,17 @@ int *generate_game(int width, int height, int mines) {
 }
 
 
+/*
+ * Allow the user to play minesweeper with the generated board
+ * Args:
+ *      width (int) - the width of the Minesweeper board
+ *      height (int) - the height of the Minesweeper board
+ *      board (int *) - the completed Minesweeper board
+ *      currentBoard (int *) - the current state of the Minesweeper board
+ * Ret:
+ *      None
+ */
 void play_minesweeper(int width, int height, int *board, int* currentBoard) {
-    /*
-     * Allow the user to play minesweeper with the generated board
-     * Args:
-     *      width (int) - the width of the Minesweeper board
-     *      height (int) - the height of the Minesweeper board
-     *      board (int *) - the completed Minesweeper board
-     *      currentBoard (int *) - the current state of the Minesweeper board
-     * Ret:
-     *      None
-     */
-    printf("DEBUG: in play_minesweeper\n");
 
     print_board(width, height, board);
     print_board(width, height, currentBoard);
@@ -139,17 +150,16 @@ void play_minesweeper(int width, int height, int *board, int* currentBoard) {
 }
 
 
+/*
+ * Print the game board
+ * Args:
+ *      width (int) - the width of the Minesweeper board
+ *      height (int) - the height of the Minesweeper board
+ *      board (int *) - the board to be printed
+ * Ret:
+ *      None
+ */
 void print_board(int width, int height, int *board) {
-    /*
-     * Print the game board
-     * Args:
-     *      width (int) - the width of the Minesweeper board
-     *      height (int) - the height of the Minesweeper board
-     *      board (int *) - the board to be printed
-     * Ret:
-     *      None
-     */
-    printf("DEBUG: in print_board\n");
 
     int cellNum, k;
     char cell;
@@ -184,7 +194,7 @@ void print_board(int width, int height, int *board) {
             } else if (cellNum == 12) {                     // Explosion (12)
                 printf("💥 ");
             } else {
-                printf("\nERROR: Unexpected value in found in game board\n\n");
+                fprintf(stderr, "\nERROR: Unexpected value in found in game board");
                 exit(1);
             }
         }
@@ -207,21 +217,20 @@ void print_board(int width, int height, int *board) {
 }
 
 
+/*
+ * Generate the blank board to correspond to what the player has learned so far
+ * Args:
+ *      width (int) - the width of the Minesweeper board
+ *      height (int) - the height of the Minesweeper board
+ * Ret:
+ *      currentBoard (int *) - the blank board of all unknown cells that the player will begin with
+ */
 int *generate_blank_board(int width, int height) {
-    /*
-     * Generate the blank board to correspond to what the player has learned so far
-     * Args:
-     *      width (int) - the width of the Minesweeper board
-     *      height (int) - the height of the Minesweeper board
-     * Ret:
-     *      currentBoard (int *) - the blank board of all unknown cells that the player will begin with
-     */
-    printf("DEBUG: in generate_blank_board\n");
 
     int *currentBoard = malloc(sizeof(int) * (width * height));
 
     if (!currentBoard) {
-        printf("\nERROR: malloc failed!\n\n");
+        perror("\nERROR: malloc failed");
         exit(1);
     }
 
@@ -234,15 +243,16 @@ int *generate_blank_board(int width, int height) {
 }
 
 
+/*
+ * Count the number of mines neighboring each cell and update their values accordingly
+ * Args:
+ *      width (int) - the width of the Minesweeper board
+ *      height (int) - the height of the Minesweeper board
+ *      board (int *) - the Minesweeper board with which to update the neighbor countss
+ * Ret:
+ *      None
+ */
 void update_neighbor_counts(int width, int height, int *board) {
-    /*
-     * Count the number of mines neighboring each cell and update their values accordingly
-     * Args:
-     *      width (int) - the width of the Minesweeper board
-     *      height (int) - the height of the Minesweeper board
-     *      board (int *) - the Minesweeper board with which to update the neighbor countss
-     */
-    printf("DEBUG: in update_neighbor_counts\n");
 
     int cellNum, neighbors;
     
@@ -259,20 +269,19 @@ void update_neighbor_counts(int width, int height, int *board) {
 }
 
 
+/*
+ * Count the number of neighboring cells of a given type to a given cell
+ * Args:
+ *      width (int) - the width of the Minesweeper board
+ *      height (int) - the height of the Minesweeper board
+ *      board (int *) - the Minesweeper board to count on
+ *      i (int) - the row of the cell that is being checked
+ *      j (int) - the column of the cell that is being checked
+ *      type (int) - the type of cell we are searching for in the neighbors
+ * Ret:
+ *      counter (int) - the number of neighboring cells of the given type
+ */
 int count_neighbors(int width, int height, int *board, int i, int j, int type) {
-    /*
-     * Count the number of neighboring cells of a given type to a given cell
-     * Args:
-     *      width (int) - the width of the Minesweeper board
-     *      height (int) - the height of the Minesweeper board
-     *      board (int *) - the Minesweeper board to count on
-     *      i (int) - the row of the cell that is being checked
-     *      j (int) - the column of the cell that is being checked
-     *      type (int) - the type of cell we are searching for in the neighbors
-     * Ret:
-     *      counter (int) - the number of neighboring cells of the given type
-     */
-    printf("DEBUG: in count_neighbors\n");
 
     int counter = 0;
     
@@ -289,4 +298,41 @@ int count_neighbors(int width, int height, int *board, int i, int j, int type) {
     }
 
     return counter;
+}
+
+
+/*
+ * Get an integer input from the user between the given low and high values, inclusive
+ * Args:
+ *      low (int) - the smallest allowed int
+ *      high (int) - the largest allowed int
+ * Ret:
+ *      num (int) - the selected int
+ */
+int get_int_input(int low, int high) {
+
+    char userInput[MAXLENGTH];
+    int num;
+
+    int validInput = 0;
+    while(!validInput) {
+        printf("Enter an int between %d and %d: ", low, high);
+        fflush(stdout);
+
+        fgets(userInput, MAXLENGTH, stdin);
+
+        if (ferror(stdin)) {
+            perror("\nERROR: fgets failed");
+            exit(1);
+        }
+
+        num = atoi(userInput);
+
+        if ((num >= low) && (num <= high)) {
+            validInput = 1;
+        }
+        
+    }
+
+    return num;
 }
