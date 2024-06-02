@@ -4,7 +4,7 @@
  * V Buckley
  * Started: 05.29.2024
  * 
- * v1.105
+ * v1.107
  */
 
 
@@ -41,18 +41,32 @@ struct minesweeperData {
 };
 
 
+/*
+ * All of the editable settings options
+ */
+struct settingsData {
+
+    int seed;
+
+    int mercy;
+    int easyFill;
+    int assistedStart;
+    int mineMoveRandom;
+};
+
+
 
 
 /*************************** Function Prototypes ***************************/
 
-void generate_game(struct minesweeperData *data);
+void generate_game(struct minesweeperData *data, struct settingsData *settings);
 void play_minesweeper(struct minesweeperData *data);
 void print_board(struct minesweeperData *data, int *board);
 void generate_blank_board(struct minesweeperData *data);
 void update_neighbor_counts(struct minesweeperData *data);
 int count_neighbors(struct minesweeperData *data, int i, int j, int type);
 int get_int_input(int low, int high);
-void difficultyManager(struct minesweeperData *data);
+int difficultyManager(struct minesweeperData *data);
 
 
 
@@ -61,24 +75,26 @@ void difficultyManager(struct minesweeperData *data);
 
 int main() {
 
+    int loop = 1, ret;
     struct minesweeperData data;
-    int loop;
+    struct settingsData settings;
 
-    srand(time(NULL));
-    
-    loop = 1;
     while (loop) {
-        difficultyManager(&data);
-        generate_game(&data);
-        generate_blank_board(&data);
+        ret = difficultyManager(&data);
 
-        play_minesweeper(&data);
-        
-        loop = 0;
+        if(ret == 0) {
+            generate_game(&data, &settings);
+            generate_blank_board(&data);
+            
+            play_minesweeper(&data);
+
+            free(data.board);
+            free(data.currentBoard);
+
+        } else {
+            loop = 0;
+        }
     }
-
-    free(data.board);
-    free(data.currentBoard);
 
     return 0;
 }
@@ -92,11 +108,9 @@ int main() {
  * Ret:
  *      None
  */
-void generate_game(struct minesweeperData *data) {
+void generate_game(struct minesweeperData *data, struct settingsData *settings) {
     
-    int i;
-    int mineCounter;
-    int cellIdx;
+    int i = 0, mineCounter = 0, cellIdx;
 
     (data->board) = malloc(sizeof(int) * ((data->width) * (data->height)));
 
@@ -105,17 +119,22 @@ void generate_game(struct minesweeperData *data) {
         exit(1);
     }
 
-    for (i = 0; i < ((data->width) * (data->height)); i++) {
+    for (i; i < ((data->width) * (data->height)); i++) {
         (data->board)[i] = 0;
     }
 
-    mineCounter = 0;
+    if ((settings->seed) == -1) {
+        srand(time(NULL));
+
+    } else {
+        srand(settings->seed);
+    }
+
     while (mineCounter < (data->mines)) {
         cellIdx = rand() % ((data->width) * (data->height));
 
         if ((data->board)[cellIdx] != 9) {
             (data->board)[cellIdx] = 9;
-
             mineCounter++;
         }
     }
@@ -134,8 +153,35 @@ void generate_game(struct minesweeperData *data) {
  */
 void play_minesweeper(struct minesweeperData *data) {
 
+    int loop = 1, x, y;
+
     print_board(data, (data->board));
-    print_board(data, (data->currentBoard));
+
+    while (loop) {
+        print_board(data, (data->currentBoard));
+
+        printf("\nReveal mode (enter 0 to switch modes)\n");
+
+        printf("\nPlease select a column (x):\n");
+        x = get_int_input(0, (data->width));
+
+        if (!x) {
+            printf("DEBUG: mode swap\n");
+
+        } else {
+            printf("\nPlease select a row (y):\n");
+            y = get_int_input(0, (data->height));
+
+            if (!y) {
+                printf("DEBUG: mode swap\n");
+            
+            } else {
+                printf("DEBUG: reveal\n");
+
+                loop = 0;
+            }
+        }
+    }
 
 }
 
@@ -149,39 +195,44 @@ void play_minesweeper(struct minesweeperData *data) {
  */
 void print_board(struct minesweeperData *data, int *board) {
 
-    int i, j, k;
-    int cellNum;
-    char cell;
+    int i = 0, j, cellNum;
 
     printf("     ");
-    for (k = 0; k < (data->width); k++) {
-        printf(" %-2d", k + 1);
+    for (i; i < (data->width); i++) {
+        printf(" %-2d", i + 1);
     }
     printf("\n");
 
     printf("   +-");
-    for (k = 0; k < (data->width); k++) {
+    for (i = 0; i < (data->width); i++) {
         printf("---");
     }
     printf("-+\n");
     
     for (i = 0; i < (data->height); i++) {
         printf("%2d | ", ((data->height) - i));
+
         for (j = 0; j < (data->width); j++) {
             cellNum = board[j + (i * (data->width))];
             
             if (cellNum == 0) {                             // Empty (0)
                 printf(" %c ", ' ');
+
             } else if ((cellNum >= 1) && (cellNum <= 8)) {  // Number (1-8)
                 printf(" %d ", cellNum);
+
             } else if (cellNum == 9) {                      // Mine (9)
                 printf("💣 ");
+
             } else if (cellNum == 10) {                     // Flag (10)
                 printf(" 🚩");
+
             } else if (cellNum == 11) {                     // Hidden (11)
                 printf(" - ");
+
             } else if (cellNum == 12) {                     // Explosion (12)
                 printf("💥 ");
+
             } else {
                 fprintf(stderr, "\nERROR: Unexpected value in found in game board");
                 exit(1);
@@ -192,14 +243,14 @@ void print_board(struct minesweeperData *data, int *board) {
     }
 
     printf("   +-");
-    for (k = 0; k < (data->width); k++) {
+    for (i = 0; i < (data->width); i++) {
         printf("---");
     }
     printf("-+\n");
 
     printf("     ");
-    for (k = 0; k < (data->width); k++) {
-        printf(" %-2d", k + 1);
+    for (i = 0; i < (data->width); i++) {
+        printf(" %-2d", i + 1);
     }
     printf("\n");
 
@@ -215,7 +266,7 @@ void print_board(struct minesweeperData *data, int *board) {
  */
 void generate_blank_board(struct minesweeperData *data) {
 
-    int i;
+    int i = 0;
 
     (data->currentBoard) = malloc(sizeof(int) * ((data->width) * (data->height)));
 
@@ -224,7 +275,7 @@ void generate_blank_board(struct minesweeperData *data) {
         exit(1);
     }
 
-    for (i = 0; i < ((data->width) * (data->height)); i++) {
+    for (i; i < ((data->width) * (data->height)); i++) {
         (data->currentBoard)[i] = 11;
     }
 
@@ -240,11 +291,9 @@ void generate_blank_board(struct minesweeperData *data) {
  */
 void update_neighbor_counts(struct minesweeperData *data) {
 
-    int i, j;
-    int cellNum;
-    int neighbors;
+    int i = 0, j, cellNum, neighbors;
     
-    for (i = 0; i < (data->height); i++) {
+    for (i; i < (data->height); i++) {
         for (j = 0; j < (data->width); j++) {
             cellNum = (data->board)[j + (i * (data->width))];
 
@@ -270,10 +319,9 @@ void update_neighbor_counts(struct minesweeperData *data) {
  */
 int count_neighbors(struct minesweeperData *data, int i, int j, int type) {
 
-    int colOffset, rowOffset;
-    int counter = 0;
+    int counter = 0, colOffset = -1, rowOffset;
     
-    for (colOffset = -1; colOffset <= 1; colOffset++) {
+    for (colOffset; colOffset <= 1; colOffset++) {
         if ((j + colOffset >= 0) && (j + colOffset < (data->width))) {
             for (rowOffset = -1; rowOffset <= 1; rowOffset++) {
                 if ((i + rowOffset >= 0) && (i + rowOffset < (data->height))) {
@@ -299,18 +347,16 @@ int count_neighbors(struct minesweeperData *data, int i, int j, int type) {
  */
 int get_int_input(int low, int high) {
 
+    int validInput = 0, num;
+    char *ret;
     char userInput[MAXLENGTH];
-    int num;
-    int validInput;
 
-    validInput = 0;
     while(!validInput) {
         printf("Enter an int between %d and %d: ", low, high);
         fflush(stdout);
 
-        fgets(userInput, MAXLENGTH, stdin);
-
-        if (ferror(stdin)) {
+        ret = fgets(userInput, MAXLENGTH, stdin);
+        if ((ferror(stdin)) || (!ret)) {
             perror("\nERROR: fgets failed");
             exit(1);
         }
@@ -320,7 +366,6 @@ int get_int_input(int low, int high) {
         if ((num >= low) && (num <= high)) {
             validInput = 1;
         }
-        
     }
 
     return num;
@@ -334,33 +379,46 @@ int get_int_input(int low, int high) {
  * Ret:
  *      None
  */
-void difficultyManager(struct minesweeperData *data) {
+int difficultyManager(struct minesweeperData *data) {
     
-    int difficulty = get_int_input(1, 4);
+    int difficulty, ret = 0;
 
-    printf("HERE 1\n");
+    printf("\nPlease select a difficulty:\n");
+    printf("  0) Back\n");
+    printf("  1) Beginner\n");
+    printf("  2) Intermediate\n");
+    printf("  3) Expert\n");
+    printf("  4) Custom\n\n");
 
-    if (difficulty == 1) {
-        printf("HERE 2\n");
+    difficulty = get_int_input(0, 4);
+
+    if (difficulty == 0) {
+        ret = 1;
+
+    } else if (difficulty == 1) {
         (data->width) = 8;
-        printf("HERE 3\n");
         (data->height) = 8;
         (data->mines) = 10;
+
     } else if (difficulty == 2) {
         (data->width) = 16;
         (data->height) = 16;
         (data->mines) = 40;
+
     } else if (difficulty == 3) {
         (data->width) = 30;
         (data->height) = 16;
         (data->mines) = 99;
+
     } else if (difficulty == 4) {
         (data->width) = get_int_input(1, 99);
         (data->height) = get_int_input(1, 99);
         (data->mines) = get_int_input(0, ((data->width) * (data->height)));
+
     } else {
         fprintf(stderr, "\nERROR: invalid difficulty setting");
         exit(1);
     }
 
+    return ret;
 }
