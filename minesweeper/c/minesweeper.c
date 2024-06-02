@@ -4,7 +4,7 @@
  * V Buckley
  * Started: 05.29.2024
  * 
- * v1.107
+ * v1.108
  */
 
 
@@ -67,6 +67,9 @@ void update_neighbor_counts(struct minesweeperData *data);
 int count_neighbors(struct minesweeperData *data, int i, int j, int type);
 int get_int_input(int low, int high);
 int difficultyManager(struct minesweeperData *data);
+int main_menu(struct minesweeperData *data, struct settingsData *settings);
+void print_title();
+int menu_selector();
 
 
 
@@ -80,20 +83,14 @@ int main() {
     struct settingsData settings;
 
     while (loop) {
-        ret = difficultyManager(&data);
-
-        if(ret == 0) {
-            generate_game(&data, &settings);
-            generate_blank_board(&data);
+        ret = main_menu(&data, &settings);
             
-            play_minesweeper(&data);
+        play_minesweeper(&data);
 
-            free(data.board);
-            free(data.currentBoard);
+        free(data.board);
+        free(data.currentBoard);
 
-        } else {
-            loop = 0;
-        }
+        loop = 0;
     }
 
     return 0;
@@ -105,6 +102,7 @@ int main() {
  * Generate the Minesweeper game board
  * Args:
  *      data (minesweeperData *) - the struct containing all of the Minesweeper board data
+ *      settings (settingsData *) - the editable settings that the user can control
  * Ret:
  *      None
  */
@@ -421,4 +419,75 @@ int difficultyManager(struct minesweeperData *data) {
     }
 
     return ret;
+}
+
+
+/*
+ * Control the main menu of the game, allowing the user to change settings and begin playing
+ * Args:
+ *      data (minesweeperData *) - the current game data struct
+ *      settings (settingsData *) - the editable settings that the user can control
+ * Ret:
+ *      ret (int) - TODO
+ */
+int main_menu(struct minesweeperData *data, struct settingsData *settings) {
+
+    int selection, ret;
+
+    print_title();
+
+    selection = menu_selector();
+
+    if (selection == 1) {
+        ret = difficultyManager(data);
+
+            if(ret == 0) {
+                generate_game(data, settings);
+                generate_blank_board(data);
+            }
+    }
+
+    return ret;
+}
+
+
+/*
+ * Print the title art and creator
+ * Args:
+ *      None
+ * Ret:
+ *      None
+ */
+void print_title() {
+    
+    printf("\n");
+    printf(" ___________ _______ _______ _______ _______ ___   _   _ _______ _______ _______ _______ _______\n");
+    printf("|    _   _  |_     _|    _  |    ___|    ___|   | | | | |    ___|    ___|    _  |    ___|    _  |\n");
+    printf("|   | | | | | |   | |   | | |   |___|   |___|   | | | | |   |___|   |___|   |_| |   |___|   |_| |_\n");
+    printf("|   | | | | | |   | |   | | |    ___|_____  |   | | | | |    ___|    ___|    ___|    ___|    ___  |\n");
+    printf("|   | | | | |_|   |_|   | | |   |___ _____| |   |_| |_| |   |___|   |___|   |   |   |___|   |   | |\n");
+    printf("|___| |_| |_|_______|___| |_|_______|_______|___________|_______|_______|___|   |_______|___|   |_|\n");
+    printf("                                   Created by Grand Violet, 2024\n");
+
+}
+
+
+/*
+ * Allow the user to select a menu option
+ * Args:
+ *      None
+ * Ret:
+ *      selection (int) - the chosen selections
+ */
+int menu_selector() {
+    
+    int selection;
+
+    printf("  1) Play\n");
+    printf("  2) Settings\n");
+    printf("  0) Quit\n");
+
+    selection = get_int_input(0, 2);
+
+    return selection;
 }
