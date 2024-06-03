@@ -4,7 +4,7 @@
  * V Buckley
  * Started: 05.29.2024
  * 
- * v1.108
+ * v1.109
  */
 
 
@@ -213,22 +213,47 @@ void print_board(struct minesweeperData *data, int *board) {
         for (j = 0; j < (data->width); j++) {
             cellNum = board[j + (i * (data->width))];
             
-            if (cellNum == 0) {                             // Empty (0)
-                printf(" %c ", ' ');
+            if ((cellNum >= 0) && (cellNum <= 8)) {     // Number (0-8)
+                if (cellNum == 0) {         // Blank (8)
+                    printf("\033[8m");
+                
+                } else if (cellNum == 1) {  // Blue (34)
+                    printf("\033[34m");
+                
+                } else if (cellNum == 2) {  // Green (32)
+                    printf("\033[32m");
+                
+                } else if (cellNum == 3) {  // Red (31)
+                    printf("\033[31m");
+                
+                } else if (cellNum == 4) {  // Darkened Blue (2;34)
+                    printf("\033[2;34m");
+                
+                } else if (cellNum == 5) {  // Darkened Red (2;31)
+                    printf("\033[2;31m");
+                
+                } else if (cellNum == 6) {  // Cyan (36)
+                    printf("\033[36m");
+                
+                } else if (cellNum == 7) {  // Darkened White (2)
+                    printf("\033[2m");
+                
+                } else {                    // White (37)
+                    printf("\033[1;37m");
+                }
 
-            } else if ((cellNum >= 1) && (cellNum <= 8)) {  // Number (1-8)
-                printf(" %d ", cellNum);
-
-            } else if (cellNum == 9) {                      // Mine (9)
+                printf("\033[1m %d \033[m", cellNum);
+            
+            } else if (cellNum == 9) {                  // Mine (9)
                 printf("💣 ");
 
-            } else if (cellNum == 10) {                     // Flag (10)
+            } else if (cellNum == 10) {                 // Flag (10)
                 printf(" 🚩");
 
-            } else if (cellNum == 11) {                     // Hidden (11)
-                printf(" - ");
+            } else if (cellNum == 11) {                 // Hidden (11)
+                printf("\033[2m - \033[m");
 
-            } else if (cellNum == 12) {                     // Explosion (12)
+            } else if (cellNum == 12) {                 // Explosion (12)
                 printf("💥 ");
 
             } else {
