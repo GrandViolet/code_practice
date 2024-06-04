@@ -4,7 +4,7 @@
  * V Buckley
  * Started: 05.29.2024
  * 
- * v1.109
+ * v1.110
  */
 
 
@@ -46,7 +46,7 @@ struct minesweeperData {
  */
 struct settingsData {
 
-    int seed;
+    int setSeed;
 
     int mercy;
     int easyFill;
@@ -65,7 +65,7 @@ void print_board(struct minesweeperData *data, int *board);
 void generate_blank_board(struct minesweeperData *data);
 void update_neighbor_counts(struct minesweeperData *data);
 int count_neighbors(struct minesweeperData *data, int i, int j, int type);
-int get_int_input(int low, int high);
+int get_int_input(unsigned int low, unsigned int high);
 int difficultyManager(struct minesweeperData *data);
 int main_menu(struct minesweeperData *data, struct settingsData *settings);
 void print_title();
@@ -108,7 +108,7 @@ int main() {
  */
 void generate_game(struct minesweeperData *data, struct settingsData *settings) {
     
-    int i = 0, mineCounter = 0, cellIdx;
+    int i = 0, seed, mineCounter = 0, cellIdx;
 
     (data->board) = malloc(sizeof(int) * ((data->width) * (data->height)));
 
@@ -121,11 +121,12 @@ void generate_game(struct minesweeperData *data, struct settingsData *settings) 
         (data->board)[i] = 0;
     }
 
-    if ((settings->seed) == -1) {
+    if ((settings->setSeed) == 1) {
         srand(time(NULL));
 
     } else {
-        srand(settings->seed);
+        seed = get_int_input(0, 4294967295);
+        srand(seed);
     }
 
     while (mineCounter < (data->mines)) {
@@ -236,10 +237,10 @@ void print_board(struct minesweeperData *data, int *board) {
                     printf("\033[36m");
                 
                 } else if (cellNum == 7) {  // Darkened White (2)
-                    printf("\033[2m");
+                    printf("\033[2;90m");
                 
                 } else {                    // White (37)
-                    printf("\033[1;37m");
+                    printf("\033[2;37m");
                 }
 
                 printf("\033[1m %d \033[m", cellNum);
@@ -251,7 +252,7 @@ void print_board(struct minesweeperData *data, int *board) {
                 printf(" 🚩");
 
             } else if (cellNum == 11) {                 // Hidden (11)
-                printf("\033[2m - \033[m");
+                printf("\033[2;90m - \033[m");
 
             } else if (cellNum == 12) {                 // Explosion (12)
                 printf("💥 ");
@@ -368,14 +369,15 @@ int count_neighbors(struct minesweeperData *data, int i, int j, int type) {
  * Ret:
  *      num (int) - the selected int
  */
-int get_int_input(int low, int high) {
+int get_int_input(unsigned int low, unsigned int high) {
 
-    int validInput = 0, num;
+    int validInput = 0;
+    unsigned int num;
     char *ret;
     char userInput[MAXLENGTH];
 
     while(!validInput) {
-        printf("Enter an int between %d and %d: ", low, high);
+        printf("Enter an int between %d and %u: ", low, high);
         fflush(stdout);
 
         ret = fgets(userInput, MAXLENGTH, stdin);
