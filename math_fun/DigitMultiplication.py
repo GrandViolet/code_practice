@@ -35,11 +35,12 @@ def main():
             i = int("".join(lstI))
 
             for j in range(len(lstI) - 1):
-                if int(lstI[j]) > int(lstI[j + 1]):
+                if int(lstI[j + 1]) < int(lstI[j]):
                     check = False
-                    i += 1
+                    lstI[j + 1] = lstI[j]
+
+            i = int("".join(lstI))
             
-        
         if check == True:
             steps = mult_digits(i)
 
