@@ -13,7 +13,7 @@ import sys
 def main():
     start = time.time()
 
-    max = 11 # maximum recursion depth to try and search for
+    max = 12 # maximum recursion depth to try and search for
 
     nums = []
     search = 0
