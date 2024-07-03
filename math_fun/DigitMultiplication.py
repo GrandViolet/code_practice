@@ -11,9 +11,9 @@ import time
 import sys
 
 def main():
-    start = time.time()
-
     max = int(input()) # maximum recursion depth to try and search for
+
+    start = time.time()
 
     nums = []
     search = 0
