@@ -13,7 +13,7 @@ import sys
 def main():
     start = time.time()
 
-    max = 12 # maximum recursion depth to try and search for
+    max = int(input()) # maximum recursion depth to try and search for
 
     nums = []
     search = 0
@@ -25,42 +25,42 @@ def main():
         check = True
 
         if search > 3:
-            lstI = list(str(i))
+            lstI = list(str(i)) # turn i into a list of strings
 
-            for j in range(len(lstI)):
+            for j in range(len(lstI)): # make sure i does not contain a 0 or a 1
                 if (lstI[j] == "0") or (lstI[j] == "1"):
                     check = False
                     lstI[j] = "2"
 
-            i = int("".join(lstI))
-
-            for j in range(len(lstI) - 1):
+            for j in range(len(lstI) - 1): # make sure i has digits in ascending order
                 if int(lstI[j + 1]) < int(lstI[j]):
                     check = False
                     lstI[j + 1] = lstI[j]
 
-            i = int("".join(lstI))
+            i = int("".join(lstI)) # turn i back into an int
             
         if check == True:
             steps = mult_digits(i)
 
+            sys.stdout.write("\r{0}".format("Searching...   ( %d )   %.2fs" % (i, time.time() - start)))
+
             if steps == search:
                 nums.append(i)
+
+                print("\n%d took %d steps\n" % (i, search))
+                
                 search += 1
-            
+
             i += 1
             
-            sys.stdout.write("\r{0}".format("Searching...   (\x1b[42m %d \x1b[0m)   #%d found: %d   %.2fs" % (i - 1, search - 1, nums[-1], time.time() - start)))
-        
-        else:
-            sys.stdout.write("\r{0}".format("Searching...   ( %d )   #%d found: %d   %.2fs" % (i - 1, search - 1, nums[-1], time.time() - start)))
 
-    print("\nIn the range from 0 to %d:" % (i - 1))
+    print("\nIn the range from 0 to %d:\n" % (i - 1))
 
     for k in range(len(nums)):
         print("%d took %d steps" % (nums[k], search + k - len(nums)))
 
-    print("Operation length: %.3f seconds\n" % (time.time() - start))
+    print("\n" + str(nums) + "\n")
+    print("Operation length: %f seconds\n" % (time.time() - start))
 
 def mult_digits(num):
     if len(str(num)) == 1:
