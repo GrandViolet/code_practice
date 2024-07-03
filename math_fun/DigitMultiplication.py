@@ -50,10 +50,10 @@ def main():
             
             i += 1
             
-            sys.stdout.write("\r{0}".format("Searching...   (\x1b[7;32m %d \x1b[0m)   #%d found: %d   %.2fs" % (i - 1, search - 1, nums[-1], time.time() - start)))
+            sys.stdout.write("\r{0}".format("Searching...   (\x1b[42m %d \x1b[0m)   #%d found: %d   %.2fs" % (i - 1, search - 1, nums[-1], time.time() - start)))
         
         else:
-            sys.stdout.write("\r{0}".format("Searching...   (\x1b[31m %d \x1b[0m)   #%d found: %d   %.2fs" % (i - 1, search - 1, nums[-1], time.time() - start)))
+            sys.stdout.write("\r{0}".format("Searching...   ( %d )   #%d found: %d   %.2fs" % (i - 1, search - 1, nums[-1], time.time() - start)))
 
     print("\nIn the range from 0 to %d:" % (i - 1))
 
