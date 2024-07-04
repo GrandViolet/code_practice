@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -O3 -lncurses
+CFLAGS = -g -O3
 
 all: minesweeper
 
